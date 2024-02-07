@@ -1,0 +1,21 @@
+table {
+    border: 1px solid black;
+}
+
+.board td {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+    transition: background-color 0.5s;
+    cursor: pointer;
+}
+
+.board td:hover {
+    background-color: lightsalmon;
+}
+
+.occupied {
+    background-color: rgb(92, 92, 92);
+}
