@@ -1,5 +1,21 @@
+body {
+    text-align: center;
+    background-color: rgb(212, 225, 221);
+}
+
+.set-up {
+    background-color: rgb(96, 182, 182);
+    width: 300px;
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
 table {
     border: 1px solid black;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .board td {
@@ -18,4 +34,19 @@ table {
 
 .occupied {
     background-color: rgb(92, 92, 92);
+}
+
+.cell {
+    color: rgba(0, 255, 255, 0);
+
+
+}
+
+#true {
+    color: black;
+    background-color: blueviolet;
+}
+
+.footer{
+    background-color: rgb(128, 128, 185);
 }
