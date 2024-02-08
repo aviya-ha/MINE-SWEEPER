@@ -15,6 +15,7 @@ var gGame = {
 var gIsVictory
 
 function onInit() {
+    gGame.isOn = true
     gBoard = buildBoard()
     renderBoard(gBoard)
 }
@@ -40,13 +41,29 @@ function buildBoard() {
         }
 
     }
-
-    board[0][0].isMine = true
-    board[0][1].isMine = true
-    // board[getRandomInt(0, 4)][getRandomInt(0, 4)].isMine = true
-    // board[getRandomInt(0, 4)][getRandomInt(0, 4)].isMine = true
+    // board[0][0].isMine = true
+    // board[0][1].isMine = true
+    minesLocation(board)
     setMinesNegsCount(board)
     return board
+}
+
+function minesLocation(board) {
+var howManyMinesOnTheBoard = 0
+    while (howManyMinesOnTheBoard < gLevel.mines) {
+        var num1 = getRandomInt(0, gLevel.size)
+        var num2 = getRandomInt(0, gLevel.size)
+        if (!board[num1][num2].isMine) {
+            mineRandomLocation(board, num1, num2)
+            howManyMinesOnTheBoard++
+        }
+
+
+    }
+}
+
+function mineRandomLocation(board, i, j) {
+    board[i][j].isMine = true
 }
 
 function renderBoard(board) {
@@ -78,6 +95,23 @@ function renderBoard(board) {
     // console.log('strHTML:', strHTML)
 
 }
+// gLevel = { size: 4, mines: 2 }
+function onChoosingLevel(elBtn) {
+    if (elBtn.className === "beginner") {
+        gLevel.size = 4
+        gLevel.mines = 2
+    }
+    if (elBtn.className === "medium") {
+        gLevel.size = 8
+        gLevel.mines = 14
+    }
+    if (elBtn.className === "expert") {
+        gLevel.size = 12
+        gLevel.mines = 32
+    }
+    onInit()
+
+}
 
 function checkGameOver(elCell, i, j) {
     if (checkVictory(elCell, i, j) || checkLose(elCell, i, j)) {
@@ -91,33 +125,29 @@ function gameOver(elCell, cellI, cellJ) {
 }
 
 function checkVictory(elCell, cellI, cellJ) {
-    console.log('gBoard[cellI][cellJ]:', gBoard[cellI][cellJ])
-    if (gBoard[cellI][cellJ].isMine && elCell.id === 'true') return false
-    for (var i = 0; i < gBoard.length; i++) {
-        for (var j = 0; j < gBoard[i].length; j++) {
-            var currCell = gBoard[i][j]
-            if (!(currCell.isMine && currCell.isMarked) || !(!currCell.isMine && currCell.isShow)) {
-                return false
-            }
-        }
+    if ((howManyCellsAreNotMine() === gGame.shownCount) && gGame.markedCount === gLevel.mines) {
+        gIsVictory = true
+        return true
     }
-    gIsVictory = true
-    return true
+    return false
 }
 
 function checkLose(elCell, cellI, cellJ) {
     if (elCell.innerText === MINE) {
-
-        gIsVictory = false
-        for (var i = 0; i < gBoard.length; i++) {
-            for (var j = 0; j < gBoard[i].length; j++) {
-                if (gBoard[i][j] === MINE) {
-                    showCellContent(gBoard[i][j], i, j)
+        if (gBoard[cellI][cellJ].isShow) {
+            gIsVictory = false
+            for (var i = 0; i < gBoard.length; i++) {
+                for (var j = 0; j < gBoard[i].length; j++) {
+                    if (gBoard[i][j] === MINE) {
+                        showCellContent(gBoard[i][j], i, j)
+                    }
                 }
             }
+            return true
         }
-    return true
     }
+
+
     return false
 }
 
@@ -133,3 +163,18 @@ function showModalEndGame() {
         elModalSpan.innerText = 'you lost'
     }
 }
+
+function howManyCellsAreNotMine() {
+    const cells = gLevel.size * gLevel.size - gLevel.mines
+    return cells
+}
+
+function onBtnPlayAgain() {
+    const elModal = document.querySelector('.end-game-modal')
+    elModal.style.display = 'none'
+    gGame.shownCount = 0
+    gGame.markedCount = 0
+    gGame.secsPassed = 0
+    onInit()
+}
+

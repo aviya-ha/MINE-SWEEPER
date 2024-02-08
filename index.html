@@ -13,9 +13,9 @@
 
         <h1 class="game-name">MINE SWEEPER</h1>
         <div class="levels">
-            <button class="beginner">beginner</button>
-            <button class="medium">medium</button>
-            <button class="expert">expert</button>
+            <button class="beginner" onclick="onChoosingLevel(this)">beginner</button>
+            <button class="medium" onclick="onChoosingLevel(this)">medium</button>
+            <button class="expert" onclick="onChoosingLevel(this)">expert</button>
         </div>
         <table class="board">
             <tbody></tbody>
@@ -23,7 +23,7 @@
 
         <div class="end-game-modal">
             <p>you <span class="win-or-lose">played!</span></p>
-            <button class="play-again">play again</button>
+            <button class="play-again" onclick="onBtnPlayAgain()">play again</button>
         </div>
 
     </div>
@@ -34,6 +34,7 @@
 
 
     <script src="js/util.js"></script>
+    <script src="js/mine.js"></script>
     <script src="js/cell.js"></script>
     <script src="js/game.js"></script>
 </body>

@@ -2,16 +2,23 @@
 
 function onCellClicked(elCell, i, j, ev) {
     if (gBoard[i][j].isShow) return
+    console.log('AA:', gGame.shownCount)
 
     if (ev.button === 0 && !gBoard[i][j].isMarked) {
+        console.log('BB:', gGame.shownCount)
 
-        showCellContent(elCell, i, j)
         if (gBoard[i][j].isMine) {
+            console.log('CC:', gGame.shownCount)
+            showCellContent(elCell, i, j)
             checkGameOver(elCell, i, j)
         } else if (gBoard[i][j].minesAroundCount === 0) {
+            console.log('DD:', gGame.shownCount)
+            showCellContent(elCell, i, j)
             expandShown(elCell, i, j)
             checkGameOver(elCell, i, j)
         } else {
+            console.log('EE:', gGame.shownCount)
+            showCellContent(elCell, i, j)
             checkGameOver(elCell, i, j)
         }
         // console.log('5isShow:', gBoard[i][j].isShow)
@@ -20,20 +27,18 @@ function onCellClicked(elCell, i, j, ev) {
 
     if (ev.button === 2) {
         onCellMarked(elCell, i, j)
-
     }
+    console.log('g shownCount:', gGame.shownCount)
 }
 
 function onCellMarked(elCell, i, j) {
     const currCell = gBoard[i][j]
-    console.log('gGame.markedCount',  gGame.markedCount)
 
     if (!currCell.isMarked) {
         currCell.isMarked = true
         elCell.innerText = MARK
         elCell.id = 'true'
         gGame.markedCount++
-        gGame.shownCount++
         checkGameOver(elCell, i, j)
     } else if (currCell.isMine) {
         currCell.isMarked = false
@@ -41,27 +46,35 @@ function onCellMarked(elCell, i, j) {
         elCell.id = 'false'
         gGame.markedCount--
         checkGameOver(elCell, i, j)
-        
+
     } else {
         currCell.isMarked = false
         elCell.innerText = currCell.minesAroundCount
         elCell.id = 'false'
         gGame.markedCount--
         checkGameOver(elCell, i, j)
-        
     }
 }
+var id = 0
 
 function expandShown(elCell, cellI, cellJ) {
+    console.log('11', gGame.shownCount)
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (i === cellI && j === cellJ) continue
             if (j < 0 || j >= gBoard[i].length) continue
+            if (gBoard[i][j].isShow) continue
+            console.log('////////////', id)
+            id++
+            console.log('22', gGame.shownCount)
             gBoard[i][j].isShow = true
             // console.log('elCell:', elCell)
             const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
             elCurrCell.id = 'true'
+            console.log('33', gGame.shownCount)
+            gGame.shownCount++
+            console.log('44', gGame.shownCount)
         }
     }
 }
