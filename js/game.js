@@ -20,14 +20,14 @@ function onInit() {
     renderBoard(gBoard)
 }
 
-function play() {
+function startGame(elCell, i , j) {
     gBoard = runGeneration(gBoard)
     renderBoard(gBoard)
 }
 
 console.table(buildBoard(gLevel.size))
 
-function buildBoard() {
+function buildBoard(elCell) {
     const board = []
     for (var i = 0; i < gLevel.size; i++) {
         board.push([])
@@ -43,27 +43,9 @@ function buildBoard() {
     }
     // board[0][0].isMine = true
     // board[0][1].isMine = true
-    minesLocation(board)
+    minesLocation(board,elCell)
     setMinesNegsCount(board)
     return board
-}
-
-function minesLocation(board) {
-var howManyMinesOnTheBoard = 0
-    while (howManyMinesOnTheBoard < gLevel.mines) {
-        var num1 = getRandomInt(0, gLevel.size)
-        var num2 = getRandomInt(0, gLevel.size)
-        if (!board[num1][num2].isMine) {
-            mineRandomLocation(board, num1, num2)
-            howManyMinesOnTheBoard++
-        }
-
-
-    }
-}
-
-function mineRandomLocation(board, i, j) {
-    board[i][j].isMine = true
 }
 
 function renderBoard(board) {
