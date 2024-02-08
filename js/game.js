@@ -4,7 +4,10 @@ const MINE = '💣'
 const EMPTY = ' '
 const MARK = '📌'
 
-var gBoard = []
+var gLives = 3
+var LIVES = '💕'
+
+var gBoard
 var gLevel = { size: 4, mines: 2 }
 var gGame = {
     isOn: false,
@@ -13,29 +16,21 @@ var gGame = {
     secsPassed: 0
 }
 var gIsVictory
-var currI 
-var currj 
 
-
-function onInit(indexI, indexIj) {
-    gBoard = buildBoard(indexI, indexIj)
+function onInit() {
+    gLives = 3
+    gBoard = buildBoard()
     renderBoard(gBoard)
 }
 
-// function startGame(elCell, i, j,ev) {
-//    console.log('i:', j)
-//     gGame.isOn = true
-//     gBoard = buildBoard( elCell, i, j)
-//     renderBoard(gBoard)
-//     // console.log('minesLocation(gBoard, elCell, i, j):', minesLocation(gBoard, elCell, i, j))
-    
-// }
+function startGame(indexI, indexJ) {
+    gGame.isOn = true
+    gLives = 3
+    gBoard = buildBoard(indexI, indexJ)
+    renderBoard(gBoard)
+}
 
-console.table(buildBoard(gLevel.size))
-
-
-function buildBoard( indexI, indexIj) {
-    console.log('ai:', indexI)
+function buildBoard(indexI, indexJ) {
     const board = []
     for (var i = 0; i < gLevel.size; i++) {
         board.push([])
@@ -47,15 +42,14 @@ function buildBoard( indexI, indexIj) {
                 isMarked: false
             }
         }
+
     }
-    if(gGame.isOn){minesLocation(board, indexI, indexIj)}
-    
-    
+    if (gGame.isOn) minesLocation(board, indexI, indexJ)
     return board
 }
 
-function renderBoard(board ,indexI , indexIj) {
-    setMinesNegsCount(gBoard)
+function renderBoard(board) {
+    setMinesNegsCount(board)
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -74,7 +68,7 @@ function renderBoard(board ,indexI , indexIj) {
                 cell = EMPTY
             }
 
-            strHTML += `<td id=${false} data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
+            strHTML += `<td id=${board[i][j].isShow} data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
         }
         strHTML += '</tr>'
     }
@@ -84,7 +78,6 @@ function renderBoard(board ,indexI , indexIj) {
     // console.log('strHTML:', strHTML)
 
 }
-// gLevel = { size: 4, mines: 2 }
 function onChoosingLevel(elBtn) {
     if (elBtn.className === "beginner") {
         gLevel.size = 4
@@ -110,11 +103,11 @@ function checkGameOver(elCell, i, j) {
 
 function gameOver(elCell, cellI, cellJ) {
     showModalEndGame()
-    gGame.isOn = false
 
 }
 
 function checkVictory(elCell, cellI, cellJ) {
+    console.log('gGame.shownCount:', gGame.shownCount)
     if ((howManyCellsAreNotMine() === gGame.shownCount) && gGame.markedCount === gLevel.mines) {
         gIsVictory = true
         return true
@@ -141,7 +134,6 @@ function checkLose(elCell, cellI, cellJ) {
     return false
 }
 
-
 function showModalEndGame() {
     const elModal = document.querySelector('.end-game-modal')
     const elModalSpan = document.querySelector('.end-game-modal .win-or-lose')
@@ -165,6 +157,12 @@ function onBtnPlayAgain() {
     gGame.shownCount = 0
     gGame.markedCount = 0
     gGame.secsPassed = 0
+    const elLives1 = document.querySelector('.live1')
+    elLives1.style.display = 'inline'
+    const elLives2 = document.querySelector('.live2')
+    elLives2.style.display = 'inline'
+    const elLives = document.querySelector('.live3')
+    elLives.style.display = 'inline'
     onInit()
 }
 
