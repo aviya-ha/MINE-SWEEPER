@@ -8,24 +8,33 @@
     <title>Minesweeper</title>
 </head>
 
-<body onload="onInit()">
+<body onload="onInit()" oncontextmenu="return false">
     <div class="game-screen">
 
-        <h1>minesweeper</h1>
-        <div class="set-up">
-            
+        <h1 class="game-name">MINE SWEEPER</h1>
+        <div class="levels">
+            <button class="beginner">beginner</button>
+            <button class="medium">medium</button>
+            <button class="expert">expert</button>
         </div>
         <table class="board">
             <tbody></tbody>
         </table>
 
+        <div class="end-game-modal">
+            <p>you <span class="win-or-lose">played!</span></p>
+            <button class="play-again">play again</button>
+        </div>
 
     </div>
 
-<div class="footer"><h3>aviya harel</h3></div>
+    <div class="footer">
+        <h3>aviya harel</h3>
+    </div>
 
 
     <script src="js/util.js"></script>
+    <script src="js/cell.js"></script>
     <script src="js/game.js"></script>
 </body>
 

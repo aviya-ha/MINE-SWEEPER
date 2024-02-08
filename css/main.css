@@ -1,6 +1,6 @@
 body {
     text-align: center;
-    background-color: rgb(212, 225, 221);
+    background-color: rgb(0, 0, 0);
 }
 
 .set-up {
@@ -12,20 +12,57 @@ body {
     margin-bottom: 10px;
 }
 
+.game-name {
+    font-family: Tahoma;
+    color: #dc2662;
+    margin: 30px;
+    font-size: 50px;
+}
+
+.levels {
+    margin: 30px;
+}
+
+.levels * {
+    background-color: #0a0c37ff;
+    color: antiquewhite;
+    font-family: Tahoma;
+    margin: 10px 10px 10px 10px;
+    padding: 5px;
+    font-size: 20px;
+
+}
+
+.beginner {
+    border: 1px solid #0afb60;
+    border-radius: 0% 20% 0% 20%;
+}
+
+.medium {
+    border: 1px solid #f4ff61ff;
+    border-radius: 20% 20% 20% 20%;
+}
+
+.expert {
+    border: 1px solid #f22121;
+    border-radius: 20% 0% 20% 0%;
+}
+
 table {
-    border: 1px solid black;
     margin-left: auto;
     margin-right: auto;
+
 }
 
 .board td {
     width: 30px;
     height: 30px;
-    border: 1px solid black;
+    border: 1px solid #375971ff;
     padding: 10px;
     text-align: center;
-    transition: background-color 0.5s;
+    transition: background-color 0.3s;
     cursor: pointer;
+    border-radius: 20%;
 }
 
 .board td:hover {
@@ -38,15 +75,28 @@ table {
 
 .cell {
     color: rgba(0, 255, 255, 0);
-
-
 }
 
 #true {
     color: black;
-    background-color: blueviolet;
+    background-color: #375971ff;
 }
 
-.footer{
+.end-game-modal {
+    width: 100px;
+    height: 100px;
+    background-color: #f4ff61ff;
+    font-family: Tahoma;
+    position: absolute;
+    left: 44%;
+    top: 45%;
+    display: none;
+}
+
+.footer {
+    margin-top: 100px;
     background-color: rgb(128, 128, 185);
+    height: 200px;
+    bottom: 0px;
+
 }

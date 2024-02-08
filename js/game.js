@@ -6,19 +6,23 @@ const MARK = '📌'
 
 var gBoard
 var gLevel = { size: 4, mines: 2 }
-var gGame
-
-
-
-
+var gGame = {
+    isOn: false,
+    shownCount: 0,
+    markedCount: 0,
+    secsPassed: 0
+}
+var gIsVictory
 
 function onInit() {
     gBoard = buildBoard()
     renderBoard(gBoard)
-    // setMinesNegsCount(gBoard)
-    // renderBoard(gBoard)
 }
 
+function play() {
+    gBoard = runGeneration(gBoard)
+    renderBoard(gBoard)
+}
 
 console.table(buildBoard(gLevel.size))
 
@@ -37,12 +41,13 @@ function buildBoard() {
 
     }
 
-    board[getRandomInt(0, 4)][getRandomInt(0, 4)].isMine = true
-    board[getRandomInt(0, 4)][getRandomInt(0, 4)].isMine = true
+    board[0][0].isMine = true
+    board[0][1].isMine = true
+    // board[getRandomInt(0, 4)][getRandomInt(0, 4)].isMine = true
+    // board[getRandomInt(0, 4)][getRandomInt(0, 4)].isMine = true
     setMinesNegsCount(board)
     return board
 }
-
 
 function renderBoard(board) {
     var strHTML = ''
@@ -63,7 +68,7 @@ function renderBoard(board) {
                 cell = EMPTY
             }
 
-            strHTML += `<td id=${board[i][j].isShow} data-i=${i} data-j=${j} onclick="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className}">${cell}</td>\n`
+            strHTML += `<td id=${board[i][j].isShow} data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
         }
         strHTML += '</tr>'
     }
@@ -74,106 +79,57 @@ function renderBoard(board) {
 
 }
 
+function checkGameOver(elCell, i, j) {
+    if (checkVictory(elCell, i, j) || checkLose(elCell, i, j)) {
+        gameOver()
+    } else return
+}
 
-// function renderCell(cellI, cellJ, val) {
-//     const elCell = document.querySelector(`[data-i="${cellI}"][data-j="${cellJ}"]`)
-//     elCell.innerText = val
-//     return elCell
-// }
+function gameOver(elCell, cellI, cellJ) {
+    showModalEndGame()
 
-function setMinesNegsCount(board) {
-    for (var i = 0; i < board.length; i++) {
-        for (var j = 0; j < board[i].length; j++) {
-            if (!board[i][j].isMine) {
-                var minesCount = countMinesAround(board, i, j)
-                board[i][j].minesAroundCount = minesCount
+}
+
+function checkVictory(elCell, cellI, cellJ) {
+    console.log('gBoard[cellI][cellJ]:', gBoard[cellI][cellJ])
+    if (gBoard[cellI][cellJ].isMine && elCell.id === 'true') return false
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[i].length; j++) {
+            var currCell = gBoard[i][j]
+            if (!(currCell.isMine && currCell.isMarked) || !(!currCell.isMine && currCell.isShow)) {
+                return false
             }
         }
     }
-
+    gIsVictory = true
+    return true
 }
 
-function countMinesAround(board, cellI, cellJ) {
-    var count = 0
+function checkLose(elCell, cellI, cellJ) {
+    if (elCell.innerText === MINE) {
 
-    for (var i = cellI - 1; i <= cellI + 1; i++) {
-        if (i < 0 || i >= board.length) continue
-        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (i === cellI && j === cellJ) continue
-            if (j < 0 || j >= board[i].length) continue
-            if (board[i][j].isMine) count++
+        gIsVictory = false
+        for (var i = 0; i < gBoard.length; i++) {
+            for (var j = 0; j < gBoard[i].length; j++) {
+                if (gBoard[i][j] === MINE) {
+                    showCellContent(gBoard[i][j], i, j)
+                }
+            }
         }
+    return true
     }
-    return count
+    return false
 }
 
-/// needs to be called on left click
-function onCellClicked(elCell, i, j , ev) {
-    showCellContent(elCell, i, j)
-    // if (ev.button === 1){
-        if (gBoard[i][j].isMine) {
-        gameOver(false)
-    } else if (gBoard[i][j].minesAroundCount === 0) {
-        expandShown(elCell, i, j)
-        checkGameOver()
+
+function showModalEndGame() {
+    const elModal = document.querySelector('.end-game-modal')
+    const elModalSpan = document.querySelector('.end-game-modal .win-or-lose')
+    console.log('elModalSpan:', elModalSpan)
+    elModal.style.display = 'block'
+    if (gIsVictory) {
+        elModalSpan.innerText = 'you won'
     } else {
-        checkGameOver()
-    // }
-    // }
-    // if (ev.button === 2){
-    //     ev.button.preventDefault()
-    //     if(!gBoard[i][j].isMarked){
-    //         elCell.innerText = MARK
-
-    //     }
-
-    }
-
-
-    // console.log('gBoard[i][j]:', gBoard[i][j])
-
-    // console.table(gBoard)
-
-}
-
-/// needs to be called on right click
-function onCellMarked(elCell) { }
-
-function expandShown(elCell, cellI, cellJ) {
-    for (var i = cellI - 1; i <= cellI + 1; i++) {
-        if (i < 0 || i >= gBoard.length) continue
-        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (i === cellI && j === cellJ) continue
-            if (j < 0 || j >= gBoard[i].length) continue
-            gBoard[i][j].isShow = 'true'
-            console.log('elCell:', elCell)
-            const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
-            elCurrCell.id = 'true'
-        }
+        elModalSpan.innerText = 'you lost'
     }
 }
-
-function showCellContent(elCell, i, j) {
-    gBoard[i][j].isShow = 'true'
-    elCell.id = 'true'
-}
-
-// function renderCell(cellI, cellJ, val) {
-//     const elCell = document.querySelector(`[data-i="${cellI}"][data-j="${cellJ}"]`)
-//     elCell.innerText = val
-// 
-// }
-
-function minesLocation() {
-
-}
-
-
-function checkGameOver() { }
-function gameOver(isVictory) {
-    if (isVictory) {
-        console.log('won')
-    } else { console.log('lose') }
-}
-function checkVictory() { }
-function checkLose() { }
