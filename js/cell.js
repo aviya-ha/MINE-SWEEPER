@@ -1,35 +1,47 @@
 'use strict'
 
+//gGame.isOn
 function onCellClicked(elCell, i, j, ev) {
-    if (gBoard[i][j].isShow) return
-    console.log('AA:', gGame.shownCount)
+    // if (gBoard[i][j].isShow) return
+    console.log('i:', i)
+    console.log('elCell11:', elCell)
+    if (!gGame.isOn) {
+        gGame.isOn = true
+        onInit(i, j)
+        showCellContent(elCell, i, j)
+        // console.log('showCellContent(elCell, i, j):', showCellContent(elCell, i, j))
+        return
+    } 
+        console.log('AA:', gGame.shownCount)
 
-    if (ev.button === 0 && !gBoard[i][j].isMarked) {
-        console.log('BB:', gGame.shownCount)
+        if (ev.button === 0 && !gBoard[i][j].isMarked) {
+            console.log('BB:', gGame.shownCount)
 
-        if (gBoard[i][j].isMine) {
-            console.log('CC:', gGame.shownCount)
-            showCellContent(elCell, i, j)
-            checkGameOver(elCell, i, j)
-        } else if (gBoard[i][j].minesAroundCount === 0) {
-            console.log('DD:', gGame.shownCount)
-            showCellContent(elCell, i, j)
-            expandShown(elCell, i, j)
-            checkGameOver(elCell, i, j)
-        } else {
-            console.log('EE:', gGame.shownCount)
-            showCellContent(elCell, i, j)
-            checkGameOver(elCell, i, j)
+            if (gBoard[i][j].isMine) {
+                console.log('CC:', gGame.shownCount)
+                showCellContent(elCell, i, j)
+                checkGameOver(elCell, i, j)
+            } else if (gBoard[i][j].minesAroundCount === 0) {
+                console.log('DD:', gGame.shownCount)
+                showCellContent(elCell, i, j)
+                expandShown(elCell, i, j)
+                checkGameOver(elCell, i, j)
+            } else {
+                console.log('EE:', gGame.shownCount)
+                showCellContent(elCell, i, j)
+                checkGameOver(elCell, i, j)
+            }
+            // console.log('5isShow:', gBoard[i][j].isShow)
         }
-        // console.log('5isShow:', gBoard[i][j].isShow)
+
+
+        if (ev.button === 2) {
+            onCellMarked(elCell, i, j)
+        }
+        console.log('g shownCount:', gGame.shownCount)
     }
 
 
-    if (ev.button === 2) {
-        onCellMarked(elCell, i, j)
-    }
-    console.log('g shownCount:', gGame.shownCount)
-}
 
 function onCellMarked(elCell, i, j) {
     const currCell = gBoard[i][j]
@@ -105,7 +117,9 @@ function countMinesAround(board, cellI, cellJ) {
 }
 
 function showCellContent(elCell, i, j) {
+    console.log('elCell.id:', elCell)
     gBoard[i][j].isShow = true
     elCell.id = 'true'
+    console.log('elCell.id:', elCell)
     gGame.shownCount++
 }

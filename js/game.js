@@ -4,7 +4,7 @@ const MINE = '💣'
 const EMPTY = ' '
 const MARK = '📌'
 
-var gBoard
+var gBoard = []
 var gLevel = { size: 4, mines: 2 }
 var gGame = {
     isOn: false,
@@ -13,21 +13,29 @@ var gGame = {
     secsPassed: 0
 }
 var gIsVictory
+var currI 
+var currj 
 
-function onInit() {
-    gGame.isOn = true
-    gBoard = buildBoard()
+
+function onInit(indexI, indexIj) {
+    gBoard = buildBoard(indexI, indexIj)
     renderBoard(gBoard)
 }
 
-function startGame(elCell, i , j) {
-    gBoard = runGeneration(gBoard)
-    renderBoard(gBoard)
-}
+// function startGame(elCell, i, j,ev) {
+//    console.log('i:', j)
+//     gGame.isOn = true
+//     gBoard = buildBoard( elCell, i, j)
+//     renderBoard(gBoard)
+//     // console.log('minesLocation(gBoard, elCell, i, j):', minesLocation(gBoard, elCell, i, j))
+    
+// }
 
 console.table(buildBoard(gLevel.size))
 
-function buildBoard(elCell) {
+
+function buildBoard( indexI, indexIj) {
+    console.log('ai:', indexI)
     const board = []
     for (var i = 0; i < gLevel.size; i++) {
         board.push([])
@@ -39,16 +47,15 @@ function buildBoard(elCell) {
                 isMarked: false
             }
         }
-
     }
-    // board[0][0].isMine = true
-    // board[0][1].isMine = true
-    minesLocation(board,elCell)
-    setMinesNegsCount(board)
+    if(gGame.isOn){minesLocation(board, indexI, indexIj)}
+    
+    
     return board
 }
 
-function renderBoard(board) {
+function renderBoard(board ,indexI , indexIj) {
+    setMinesNegsCount(gBoard)
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -67,7 +74,7 @@ function renderBoard(board) {
                 cell = EMPTY
             }
 
-            strHTML += `<td id=${board[i][j].isShow} data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
+            strHTML += `<td id=${false} data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
         }
         strHTML += '</tr>'
     }
@@ -103,6 +110,7 @@ function checkGameOver(elCell, i, j) {
 
 function gameOver(elCell, cellI, cellJ) {
     showModalEndGame()
+    gGame.isOn = false
 
 }
 
