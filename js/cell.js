@@ -15,7 +15,7 @@ function onCellClicked(elCell, i, j, ev) {
     }
     if (gHint) {
         gHint = false
-        showCellContent(i, j)
+        showCellContentOnHint(i, j)
         expandShownOnHint(elCell, i, j)
         setTimeout(() => {
             unShowCellContent(i, j)
@@ -27,6 +27,7 @@ function onCellClicked(elCell, i, j, ev) {
         if (gBoard[i][j].isMine) {
             isThereLives(i, j)
         } else if (gBoard[i][j].minesAroundCount === 0) {
+            showCellContent(i, j)
             expandShown(i, j)
             checkGameOver(elCell, i, j)
         } else {
@@ -67,7 +68,7 @@ function onCellMarked(elCell, i, j) {
 }
 
 function expandShown(cellI, cellJ) {
-    
+
     if (gBoard[cellI][cellJ].minesAroundCount) return
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
@@ -84,7 +85,15 @@ function expandShown(cellI, cellJ) {
 }
 
 function showCellContent(i, j) {
-    document.querySelector(`[data-i="${i}"][data-j="${j}"]`).id = 'true'
+    const elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
+    elCell.id = 'true'
+    if (gBoard[i][j].isMine) {
+        elCell.innerText = MINE
+    } else if (gBoard[i][j].isMarked) {
+        return
+    } else if (gBoard[i][j].minesAroundCount) {
+        elCell.innerText = gBoard[i][j].minesAroundCount
+    }else elCell.innerText = '0'
     gBoard[i][j].isShow = true
 }
 
@@ -114,6 +123,19 @@ function countMinesAround(board, cellI, cellJ) {
     return count
 }
 
+function showCellContentOnHint(i, j) {
+    const elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
+    elCell.id = 'true'
+    if (gBoard[i][j].isMine) {
+        elCell.innerText = MINE
+    } else if (gBoard[i][j].isMarked) {
+        return
+    } else if (gBoard[i][j].minesAroundCount) {
+        elCell.innerText = gBoard[i][j].minesAroundCount
+    }else elCell.innerText = '0'
+    
+}
+
 function expandShownOnHint(elCell, cellI, cellJ) {
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
@@ -123,26 +145,32 @@ function expandShownOnHint(elCell, cellI, cellJ) {
             if (gBoard[i][j].isShow || gBoard[i][j].isMarked) continue
             const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
             elCurrCell.id = 'true'
-
-
+            showCellContentOnHint(i, j)
         }
     }
 }
 
 function unShowCellContent(i, j) {
-    document.querySelector(`[data-i="${i}"][data-j="${j}"]`).id = 'false'
+    const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
+    elCurrCell.id = ''
+    elCurrCell.innerText = ''
     gBoard[i][j].isShow = false
+    console.log('i:', i)
+    console.log('j:', j)
 }
 
 function unExpandShown(elCell, cellI, cellJ) {
+
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (i === cellI && j === cellJ) continue
             if (j < 0 || j >= gBoard[i].length) continue
             if (gBoard[i][j].isShow) continue
+            unShowCellContent(i, j)
             const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
             elCurrCell.id = ''
+            elCurrCell.innerText = ''
         }
     }
 }

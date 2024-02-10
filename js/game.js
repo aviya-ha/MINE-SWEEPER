@@ -46,12 +46,12 @@ function buildBoard(indexI, indexIj) {
     }
     if (gGame.isOn) {
         minesLocation(board, indexI, indexIj)
+        setMinesNegsCount(board)
     }
     return board
 }
 
 function renderBoard(board, indexI, indexIj) {
-    setMinesNegsCount(gBoard)
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -69,7 +69,7 @@ function renderBoard(board, indexI, indexIj) {
                 className = 'empty'
                 cell = EMPTY
             }
-            strHTML += `<td id="" data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
+            strHTML += `<td id="" data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} "></td>\n`
         }
         strHTML += '</tr>'
     }
@@ -83,8 +83,6 @@ function onChoosingLevel(elBtn) {
         gLevel.mines = 2
         restoreGVariable()
         if (gTimerInterval) clearInterval(gTimerInterval)
-       
-        
         if (gTimerInterval) clearInterval(gTimerInterval)
     }
     if (elBtn.className === "medium") {
@@ -92,14 +90,14 @@ function onChoosingLevel(elBtn) {
         gLevel.mines = 14
         restoreGVariable()
         if (gTimerInterval) clearInterval(gTimerInterval)
-        
+
     }
     if (elBtn.className === "expert") {
         gLevel.size = 12
         gLevel.mines = 32
         restoreGVariable()
         if (gTimerInterval) clearInterval(gTimerInterval)
-        
+
     }
     onInit()
 }
@@ -154,7 +152,7 @@ function onSafeBtn(elBtn) {
     }
     gIsSafe = false
     document.querySelector(`[data-i="${i}"][data-j="${j}"]`).id = 'mark'
-    setTimeout(() => { unShowCellContent(i, j)}, 200 )
+    setTimeout(() => { unShowCellContent(i, j) }, 200)
 }
 
 function checkGameOver(elCell, i, j) {
