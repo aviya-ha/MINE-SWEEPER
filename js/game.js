@@ -15,13 +15,15 @@ var gGame = {
 var gIsVictory
 var gLives = 3
 var gTimerInterval
-
+var gIsSafe = false
 
 function onInit(indexI, indexIj) {
+    restoreGVariable()
+    gGame.isOn = false
+    if (gTimerInterval) clearInterval(gTimerInterval)
     gBoard = buildBoard(indexI, indexIj)
     renderBoard(gBoard)
 }
-
 
 function startGame(indexI, indexIj) {
     restoreGVariable()
@@ -44,12 +46,12 @@ function buildBoard(indexI, indexIj) {
     }
     if (gGame.isOn) {
         minesLocation(board, indexI, indexIj)
+        setMinesNegsCount(board)
     }
     return board
 }
 
 function renderBoard(board, indexI, indexIj) {
-    setMinesNegsCount(gBoard)
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -67,7 +69,7 @@ function renderBoard(board, indexI, indexIj) {
                 className = 'empty'
                 cell = EMPTY
             }
-            strHTML += `<td id="" data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
+            strHTML += `<td id="" data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} "></td>\n`
         }
         strHTML += '</tr>'
     }
@@ -79,14 +81,23 @@ function onChoosingLevel(elBtn) {
     if (elBtn.className === "beginner") {
         gLevel.size = 4
         gLevel.mines = 2
+        restoreGVariable()
+        if (gTimerInterval) clearInterval(gTimerInterval)
+        if (gTimerInterval) clearInterval(gTimerInterval)
     }
     if (elBtn.className === "medium") {
         gLevel.size = 8
         gLevel.mines = 14
+        restoreGVariable()
+        if (gTimerInterval) clearInterval(gTimerInterval)
+
     }
     if (elBtn.className === "expert") {
         gLevel.size = 12
         gLevel.mines = 32
+        restoreGVariable()
+        if (gTimerInterval) clearInterval(gTimerInterval)
+
     }
     onInit()
 }
@@ -101,7 +112,6 @@ function startTimer() {
 
         document.querySelector('span.seconds').innerText = seconds
         document.querySelector('span.milli-seconds').innerText = milliSeconds
-
     }, 10)
 }
 
@@ -113,6 +123,36 @@ function getFormatSeconds(timeDiff) {
 function getFormatMilliSeconds(timeDiff) {
     const milliSeconds = new Date(timeDiff).getMilliseconds()
     return (milliSeconds + '').padStart(3, '0')
+}
+
+function onBtnHints(elBtn) {
+    if (elBtn.id !== 'used') {
+        gHint = true
+        elBtn.id = 'used'
+        elBtn.innerText = '🔓'
+    } else return
+}
+
+function onSafeBtn(elBtn) {
+    if (!gGame.isOn) return
+    if (elBtn.id === 'used') return
+    elBtn.id = 'used'
+    var i
+    var j
+    while (!gIsSafe) {
+        var num1 = getRandomInt(0, gLevel.size)
+        var num2 = getRandomInt(0, gLevel.size)
+        if (gBoard[num1][num2].isMine || gBoard[num1][num2].isShow) {
+            gIsSafe = false
+        } else {
+            gIsSafe = true
+            i = num1
+            j = num2
+        }
+    }
+    gIsSafe = false
+    document.querySelector(`[data-i="${i}"][data-j="${j}"]`).id = 'mark'
+    setTimeout(() => { unShowCellContent(i, j) }, 200)
 }
 
 function checkGameOver(elCell, i, j) {
@@ -211,14 +251,19 @@ function restoreGVariable() {
     gGame.secsPassed = 0
     gLives = 3
     gHint = false
+    gIsSafe = false
     document.querySelector('.smiley').innerText = '😁'
     document.querySelector('.lives').innerText = '💕💕💕'
-    document.querySelector('.timer').innerHTML = '<span class="seconds">00</span> : <span class="milli-seconds">000</span>'
+    document.querySelector('.seconds').innerText = '00'
+    document.querySelector('.milli-seconds').innerText = '000'
     document.querySelector('.hint1').innerText = '🔒'
     document.querySelector('.hint1').id = ""
     document.querySelector('.hint2').innerText = '🔒'
     document.querySelector('.hint2').id = ""
     document.querySelector('.hint3').innerText = '🔒'
     document.querySelector('.hint3').id = ""
+    document.querySelector('.safe-click1').id = ""
+    document.querySelector('.safe-click2').id = ""
+    document.querySelector('.safe-click3').id = ""
 }
 

@@ -9,7 +9,9 @@ function onCellClicked(elCell, i, j, ev) {
         gGame.isOn = true
         startTimer()
         startGame(i, j)
+        if (!gBoard[i][j].minesAroundCount) gGame.shownCount++
         showCellContent(i, j)
+
     }
     if (gHint) {
         gHint = false
@@ -25,9 +27,7 @@ function onCellClicked(elCell, i, j, ev) {
         if (gBoard[i][j].isMine) {
             isThereLives(i, j)
         } else if (gBoard[i][j].minesAroundCount === 0) {
-            showCellContent(i, j)
-            expandShown(elCell, i, j)
-            gGame.shownCount++
+            expandShown(i, j)
             checkGameOver(elCell, i, j)
         } else {
             showCellContent(i, j)
@@ -66,30 +66,34 @@ function onCellMarked(elCell, i, j) {
     }
 }
 
-function expandShown(elCell, cellI, cellJ) {
+function expandShown(cellI, cellJ) {
+
+    if (gBoard[cellI][cellJ].minesAroundCount) return
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (i === cellI && j === cellJ) continue
             if (j < 0 || j >= gBoard[i].length) continue
-            if (gBoard[i][j].isShow) continue
+            if (gBoard[i][j].isShow || gBoard[i][j].isMarked) continue
             showCellContent(i, j)
             gGame.shownCount++
+
+            expandShown(i, j)
         }
     }
 }
 
 function showCellContent(i, j) {
-    document.querySelector(`[data-i="${i}"][data-j="${j}"]`).id = 'true'
+    const elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
+    elCell.id = 'true'
+    if (gBoard[i][j].isMine) {
+        elCell.innerText = MINE
+    } else if (gBoard[i][j].isMarked) {
+        return
+    } else {
+        elCell.innerText = gBoard[i][j].minesAroundCount
+    }
     gBoard[i][j].isShow = true
-}
-
-function onBtnHints(elBtn) {
-    if (elBtn.id !== 'used') {
-        gHint = true
-        elBtn.id = 'used'
-        elBtn.innerText = '🔓'
-    } else return
 }
 
 function setMinesNegsCount(board) {
@@ -127,8 +131,6 @@ function expandShownOnHint(elCell, cellI, cellJ) {
             if (gBoard[i][j].isShow || gBoard[i][j].isMarked) continue
             const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
             elCurrCell.id = 'true'
-
-
         }
     }
 }

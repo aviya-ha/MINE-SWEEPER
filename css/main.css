@@ -8,6 +8,7 @@ body {
     color: #dc2662;
     margin: 30px;
     font-size: 50px;
+    filter: drop-shadow(0.5px 7px 5px #0100ec);
 }
 
 .levels {
@@ -112,7 +113,7 @@ table {
 
 #true {
     color: black;
-    background-color: #375971ff;
+    background-color: rgb(113, 55, 90);
 }
 
 .footer {
@@ -135,7 +136,8 @@ table {
 
 }
 
-.hints {
+.hints,
+.safe-click {
     color: #dc2662;
     display: inline;
 
@@ -147,19 +149,22 @@ table {
     margin: 10px;
 }
 
-.hint1 {
+.hint1,
+.safe-click1 {
     background-color: rgba(255, 222, 173, 0);
     border: 1px solid rgb(255, 97, 250);
     margin: 6px;
 }
 
-.hint2 {
+.hint2,
+.safe-click2 {
     background-color: rgba(255, 222, 173, 0);
     border: 1px solid rgb(255, 97, 250);
     margin: 6px;
 }
 
-.hint3 {
+.hint3,
+.safe-click3 {
     background-color: rgba(255, 222, 173, 0);
     border: 1px solid rgb(255, 97, 250);
     margin: 6px;
@@ -167,6 +172,10 @@ table {
 
 #used {
     background-color: rgba(102, 24, 24, 0.424);
+}
+
+#mark {
+    background-color: #0afb60;
 }
 
 .bast-score {
