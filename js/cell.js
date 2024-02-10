@@ -9,14 +9,15 @@ function onCellClicked(elCell, i, j, ev) {
         gGame.isOn = true
         startTimer()
         startGame(i, j)
-        if (!gBoard[i][j].minesAroundCount) gGame.shownCount++
+        // if (!gBoard[i][j].minesAroundCount) gGame.shownCount++
         showCellContent(i, j)
 
     }
     if (gHint) {
+        if (ev.button === 2) return
         gHint = false
         showCellContentOnHint(i, j)
-        expandShownOnHint(elCell, i, j)
+        expandShownOnHint(i, j)
         setTimeout(() => {
             unShowCellContent(i, j)
             unExpandShown(elCell, i, j)
@@ -28,6 +29,7 @@ function onCellClicked(elCell, i, j, ev) {
             isThereLives(i, j)
         } else if (gBoard[i][j].minesAroundCount === 0) {
             showCellContent(i, j)
+            gGame.shownCount++
             expandShown(i, j)
             checkGameOver(elCell, i, j)
         } else {
@@ -78,7 +80,6 @@ function expandShown(cellI, cellJ) {
             if (gBoard[i][j].isShow || gBoard[i][j].isMarked) continue
             showCellContent(i, j)
             gGame.shownCount++
-
             expandShown(i, j)
         }
     }
@@ -93,7 +94,11 @@ function showCellContent(i, j) {
         return
     } else if (gBoard[i][j].minesAroundCount) {
         elCell.innerText = gBoard[i][j].minesAroundCount
-    }else elCell.innerText = '0'
+        
+    }else {
+        elCell.innerText = '0'
+        
+    } 
     gBoard[i][j].isShow = true
 }
 
@@ -136,7 +141,7 @@ function showCellContentOnHint(i, j) {
     
 }
 
-function expandShownOnHint(elCell, cellI, cellJ) {
+function expandShownOnHint(cellI, cellJ) {
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
@@ -154,19 +159,15 @@ function unShowCellContent(i, j) {
     const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
     elCurrCell.id = ''
     elCurrCell.innerText = ''
-    gBoard[i][j].isShow = false
-    console.log('i:', i)
-    console.log('j:', j)
 }
 
 function unExpandShown(elCell, cellI, cellJ) {
-
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
             if (i === cellI && j === cellJ) continue
             if (j < 0 || j >= gBoard[i].length) continue
-            if (gBoard[i][j].isShow) continue
+            if (gBoard[i][j].isShow || gBoard[i][j].isMarked) continue
             unShowCellContent(i, j)
             const elCurrCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`)
             elCurrCell.id = ''

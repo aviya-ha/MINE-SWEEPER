@@ -167,6 +167,9 @@ function gameOver(elCell, cellI, cellJ) {
 }
 
 function checkVictory(elCell, cellI, cellJ) {
+    console.log('gGame.shownCount:', gGame.shownCount)
+    console.log('gGame.markedCount:', gGame.markedCount)
+    console.log('gLevel.mines:', gLevel.mines)
     if (countRegularCells() === gGame.shownCount && gGame.markedCount === gLevel.mines) {
         gIsVictory = true
         document.querySelector('.smiley').innerText = '😎'
