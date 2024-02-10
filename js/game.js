@@ -4,11 +4,8 @@ const MINE = '💣'
 const EMPTY = ' '
 const MARK = '📌'
 
-var gLives = 3
-var LIVES = '💕'
-
-var gBoard
-var gLevel = { size: 4, mines: 2 }
+var gBoard = []
+var gLevel = { size: 4, mines: 2, }
 var gGame = {
     isOn: false,
     shownCount: 0,
@@ -16,21 +13,23 @@ var gGame = {
     secsPassed: 0
 }
 var gIsVictory
+var gLives = 3
+var gTimerInterval
 
-function onInit() {
-    gLives = 3
-    gBoard = buildBoard()
+
+function onInit(indexI, indexIj) {
+    gBoard = buildBoard(indexI, indexIj)
     renderBoard(gBoard)
 }
 
-function startGame(indexI, indexJ) {
-    gGame.isOn = true
-    gLives = 3
-    gBoard = buildBoard(indexI, indexJ)
+
+function startGame(indexI, indexIj) {
+    restoreGVariable()
+    gBoard = buildBoard(indexI, indexIj)
     renderBoard(gBoard)
 }
 
-function buildBoard(indexI, indexJ) {
+function buildBoard(indexI, indexIj) {
     const board = []
     for (var i = 0; i < gLevel.size; i++) {
         board.push([])
@@ -42,14 +41,15 @@ function buildBoard(indexI, indexJ) {
                 isMarked: false
             }
         }
-
     }
-    if (gGame.isOn) minesLocation(board, indexI, indexJ)
+    if (gGame.isOn) {
+        minesLocation(board, indexI, indexIj)
+    }
     return board
 }
 
-function renderBoard(board) {
-    setMinesNegsCount(board)
+function renderBoard(board, indexI, indexIj) {
+    setMinesNegsCount(gBoard)
     var strHTML = ''
     for (var i = 0; i < board.length; i++) {
         strHTML += '<tr>'
@@ -67,17 +67,14 @@ function renderBoard(board) {
                 className = 'empty'
                 cell = EMPTY
             }
-
-            strHTML += `<td id=${board[i][j].isShow} data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
+            strHTML += `<td id="" data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j} ,event)" class="cell ${className} ${cell} ">${cell}</td>\n`
         }
         strHTML += '</tr>'
     }
-
     const elBoard = document.querySelector('.board tbody')
     elBoard.innerHTML = strHTML
-    // console.log('strHTML:', strHTML)
-
 }
+
 function onChoosingLevel(elBtn) {
     if (elBtn.className === "beginner") {
         gLevel.size = 4
@@ -92,7 +89,30 @@ function onChoosingLevel(elBtn) {
         gLevel.mines = 32
     }
     onInit()
+}
 
+function startTimer() {
+    if (gTimerInterval) clearInterval(gTimerInterval)
+    var startTime = Date.now()
+    gTimerInterval = setInterval(() => {
+        const timeDiff = Date.now() - startTime
+        const seconds = getFormatSeconds(timeDiff)
+        const milliSeconds = getFormatMilliSeconds(timeDiff)
+
+        document.querySelector('span.seconds').innerText = seconds
+        document.querySelector('span.milli-seconds').innerText = milliSeconds
+
+    }, 10)
+}
+
+function getFormatSeconds(timeDiff) {
+    const seconds = Math.floor(timeDiff / 1000)
+    return (seconds + '').padStart(2, '0')
+}
+
+function getFormatMilliSeconds(timeDiff) {
+    const milliSeconds = new Date(timeDiff).getMilliseconds()
+    return (milliSeconds + '').padStart(3, '0')
 }
 
 function checkGameOver(elCell, i, j) {
@@ -102,51 +122,37 @@ function checkGameOver(elCell, i, j) {
 }
 
 function gameOver(elCell, cellI, cellJ) {
-    showModalEndGame()
-
+    gGame.isOn = false
+    clearInterval(gTimerInterval)
 }
 
 function checkVictory(elCell, cellI, cellJ) {
-    console.log('gGame.shownCount:', gGame.shownCount)
-    if ((howManyCellsAreNotMine() === gGame.shownCount) && gGame.markedCount === gLevel.mines) {
+    if (countRegularCells() === gGame.shownCount && gGame.markedCount === gLevel.mines) {
         gIsVictory = true
+        document.querySelector('.smiley').innerText = '😎'
+        bestScore()
         return true
     }
     return false
 }
 
 function checkLose(elCell, cellI, cellJ) {
-    if (elCell.innerText === MINE) {
-        if (gBoard[cellI][cellJ].isShow) {
-            gIsVictory = false
-            for (var i = 0; i < gBoard.length; i++) {
-                for (var j = 0; j < gBoard[i].length; j++) {
-                    if (gBoard[i][j] === MINE) {
-                        showCellContent(gBoard[i][j], i, j)
-                    }
+    if (gLives === 0) {
+        gIsVictory = false
+        for (var i = 0; i < gBoard.length; i++) {
+            for (var j = 0; j < gBoard[i].length; j++) {
+                if (gBoard[i][j].isMine) {
+                    showCellContent(i, j)
                 }
             }
-            return true
         }
+        document.querySelector('.smiley').innerText = '🤯'
+        return true
     }
-
-
     return false
 }
 
-function showModalEndGame() {
-    const elModal = document.querySelector('.end-game-modal')
-    const elModalSpan = document.querySelector('.end-game-modal .win-or-lose')
-    console.log('elModalSpan:', elModalSpan)
-    elModal.style.display = 'block'
-    if (gIsVictory) {
-        elModalSpan.innerText = 'you won'
-    } else {
-        elModalSpan.innerText = 'you lost'
-    }
-}
-
-function howManyCellsAreNotMine() {
+function countRegularCells() {
     const cells = gLevel.size * gLevel.size - gLevel.mines
     return cells
 }
@@ -157,12 +163,62 @@ function onBtnPlayAgain() {
     gGame.shownCount = 0
     gGame.markedCount = 0
     gGame.secsPassed = 0
-    const elLives1 = document.querySelector('.live1')
-    elLives1.style.display = 'inline'
-    const elLives2 = document.querySelector('.live2')
-    elLives2.style.display = 'inline'
-    const elLives = document.querySelector('.live3')
-    elLives.style.display = 'inline'
     onInit()
+}
+
+function bestScore() {
+    const seconds = document.querySelector('.seconds')
+    const milliSeconds = document.querySelector('.milli-seconds')
+    const secondsBest = document.querySelector('.seconds-best')
+    const milliSecondsBest = document.querySelector('.milli-seconds-best')
+
+    if (secondsBest.innerText === '00' && milliSecondsBest.innerText === '000') {
+        changeBestScore()
+    } else if (seconds.innerText.charAt(0) < secondsBest.innerText.charAt(0)) {
+        changeBestScore()
+    } else if (seconds.innerText.charAt(0) === secondsBest.innerText.charAt(0)) {
+        if (seconds.innerText.charAt(1) < secondsBest.innerText.charAt(1)) {
+            changeBestScore()
+        } else if (seconds.innerText.charAt(1) === secondsBest.innerText.charAt(1)) {
+            if (milliSeconds.innerText.charAt(0) < milliSecondsBest.innerText.charAt(0)) {
+                changeBestScore()
+            } else if (milliSeconds.innerText.charAt(0) === milliSecondsBest.innerText.charAt(0)) {
+                if (milliSeconds.innerText.charAt(1) < milliSecondsBest.innerText.charAt(1)) {
+                    changeBestScore()
+                } else if (milliSeconds.innerText.charAt(1) === milliSecondsBest.innerText.charAt(1)) {
+                    if (milliSeconds.innerText.charAt(2) < milliSecondsBest.innerText.charAt(2)) {
+                        changeBestScore()
+                    }
+                }
+            }
+        }
+    }
+    return
+}
+
+function changeBestScore() {
+    const seconds = document.querySelector('.seconds')
+    const milliSeconds = document.querySelector('.milli-seconds')
+    const secondsBest = document.querySelector('.seconds-best')
+    const milliSecondsBest = document.querySelector('.milli-seconds-best')
+    secondsBest.innerText = seconds.innerText
+    milliSecondsBest.innerText = milliSeconds.innerText
+}
+
+function restoreGVariable() {
+    gGame.shownCount = 0
+    gGame.markedCount = 0
+    gGame.secsPassed = 0
+    gLives = 3
+    gHint = false
+    document.querySelector('.smiley').innerText = '😁'
+    document.querySelector('.lives').innerText = '💕💕💕'
+    document.querySelector('.timer').innerHTML = '<span class="seconds">00</span> : <span class="milli-seconds">000</span>'
+    document.querySelector('.hint1').innerText = '🔒'
+    document.querySelector('.hint1').id = ""
+    document.querySelector('.hint2').innerText = '🔒'
+    document.querySelector('.hint2').id = ""
+    document.querySelector('.hint3').innerText = '🔒'
+    document.querySelector('.hint3').id = ""
 }
 

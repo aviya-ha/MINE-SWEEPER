@@ -11,30 +11,34 @@
 <body onload="onInit()" oncontextmenu="return false">
     <div class="game-screen">
 
+        <div class="breaking-heart">💔</div>
         <h1 class="game-name">MINE SWEEPER</h1>
         <div class="levels">
             <button class="beginner" onclick="onChoosingLevel(this)">beginner</button>
             <button class="medium" onclick="onChoosingLevel(this)">medium</button>
             <button class="expert" onclick="onChoosingLevel(this)">expert</button>
         </div>
-        <div class="live">
-            <span class="live1">💕</span>
-            <span class="live2">💕</span>
-            <span class="live3">💕</span>
-            <span class="smaily">😁</span>
-            <span class="timer">
-                <span class="timerrr">00:00</span>
-            </span>
-            
+        <div class="game-stats">
+            <div class="lives">💕💕💕</div>
+            <button class="smiley" onclick="startGame()">😁</button>
+            <div class="timer">
+                <span class="seconds">00</span> : <span class="milli-seconds">000</span>
+            </div>
+        </div>
+        <div class="hints">
+            <button id="" class="hint1" onclick="onBtnHints(this)">🔒</button>
+            <button id="" class="hint2" onclick="onBtnHints(this)">🔒</button>
+            <button id="" class="hint3" onclick="onBtnHints(this)">🔒</button>
+        </div>
+        <div class="bast-score">
+            <span class="the-best-score">best score: <span class="seconds-best">00</span>:<span
+                    class="milli-seconds-best">000</span>
         </div>
         <table class="board">
             <tbody></tbody>
         </table>
 
-        <div class="end-game-modal">
-            <p>you <span class="win-or-lose">played!</span></p>
-            <button class="play-again" onclick="onBtnPlayAgain()">play again</button>
-        </div>
+
 
     </div>
 
